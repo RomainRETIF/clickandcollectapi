@@ -3,10 +3,14 @@ package com.example.clickandcollectapi;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.type.classreading.MethodMetadataReadingVisitor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,4 +45,25 @@ public class MainController {
 	public @ResponseBody Optional<Magasin> findMagasinById (@PathVariable Integer magasinId){
 		return magasinRepository.findById(magasinId);
 	}
+
+	@DeleteMapping("/delete/{magasinId}")  
+	private void deleteMagasin(@PathVariable("magasinId") Integer magasinId)   
+	{  
+		magasinRepository.deleteById(magasinId);
+	}
+
+	@PutMapping("/update/{magasinId}")  
+	private @ResponseBody String update(@PathVariable("magasinId") Integer magasinId, @RequestParam String name, @RequestParam String description, @RequestParam String code_postal)   
+	{  
+		Optional<Magasin> n = magasinRepository.findById(magasinId);
+		if(n.isPresent()){
+			Magasin magasin = n.get();
+			magasin.setNom(name);
+			magasin.setDescription(description);
+			magasin.setCodePostal(code_postal);
+			magasinRepository.save(magasin);
+		}
+		
+		return "Saved";
+	}  
 }
