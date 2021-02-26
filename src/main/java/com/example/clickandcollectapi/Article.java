@@ -1,10 +1,11 @@
 package com.example.clickandcollectapi;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,18 +15,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 @Entity // This tells Hibernate to make a table out of this class
-public class Magasin {
+public class Article {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	
 	private Integer id;
 
-	private String nom;
+	private Double prix;
 
-	private String description;
+	@ManyToOne
+	@JoinColumn(name="idTypeArticleId")
+	private TypeArticle typeArticle;
 
-	@Column(name = "code_postal")
-	private String codePostal;
 
 	public Integer getId() {
 		return id;
@@ -35,39 +36,30 @@ public class Magasin {
 		this.id = id;
 	}
 
-	public String getNom() {
-		return nom;
+	public Double getPrix() {
+		return prix;
 	}
 
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setPrix(Double prix) {
+		this.prix = prix;
 	}
 
-	public String getDescription() {
-		return description;
+	public TypeArticle getTypeArticle() {
+		return typeArticle;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getCodePostal() {
-		return codePostal;
-	}
-
-	public void setCodePostal(String codePostal) {
-		this.codePostal = codePostal;
+	public void setTypeArticle(TypeArticle typeArticle) {
+		this.typeArticle = typeArticle;
 	}
 
 	public String toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
-		j.put("nom", nom);
-		j.put("description", description);
-		j.put("codePostal", codePostal);
-		j.put("update", "/magasin/update/" + id);
-		j.put("delete", "/magasin/delete/" + id);
+		j.put("prix", prix.toString());
+		j.put("typeArticle", typeArticle.getId());
+		j.put("update", "/article/update/" + id);
+		j.put("delete", "/article/delete/" + id);
 
 		return (j.toString());
 	}
