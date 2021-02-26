@@ -16,14 +16,14 @@ public class MainController {
 	private MagasinRepository magasinRepository;
 
 	@PostMapping(path="/add") // Map ONLY POST Requests
-	public @ResponseBody String addNewMagasin (@RequestParam String name
-			, @RequestParam String email) {
+	public @ResponseBody String addNewMagasin (@RequestParam String name, @RequestParam String description, @RequestParam String code_postal) {
 		// @ResponseBody means the returned String is the response, not a view name
 		// @RequestParam means it is a parameter from the GET or POST request
 
 		Magasin n = new Magasin();
 		n.setNom(name);
-		n.setDescription(email);
+		n.setDescription(description);
+		n.setCodePostal(code_postal);
 		magasinRepository.save(n);
 		return "Saved";
 	}
