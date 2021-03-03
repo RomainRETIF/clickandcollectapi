@@ -1,7 +1,8 @@
-package com.example.clickandcollectapi;
+package com.example.clickandcollectapi.entities;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,8 +27,12 @@ public class TypeArticle {
 
 	private String description;
 
-	@OneToMany(mappedBy = "typeArticle")
+	@OneToMany(mappedBy = "typeArticle", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Article> articles;
+
+	public List<Article> getArticles(){
+		return articles;
+	}
 
 	public Integer getId() {
 		return id;

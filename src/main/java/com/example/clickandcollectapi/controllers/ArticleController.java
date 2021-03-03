@@ -1,9 +1,11 @@
-package com.example.clickandcollectapi;
+package com.example.clickandcollectapi.controllers;
 
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.clickandcollectapi.entities.Article;
+import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.json.JSONObject;
