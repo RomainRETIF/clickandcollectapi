@@ -118,6 +118,19 @@ public class Magasin {
 		return arrayStocks;
 	}
 
+	public JSONObject ajoutToJSON() throws JsonProcessingException {
+		
+	    JSONObject j = new JSONObject();
+		j.put("id", id);
+		j.put("nom", nom);
+		j.put("description", description);
+		j.put("codePostal", codePostal);
+		j.put("update", "/magasin/update/" + id);
+		j.put("delete", "/magasin/delete/" + id);
+		j.put("help", "/swagger-ui.html#/magasin-controller");
+		return (j);
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
@@ -129,7 +142,7 @@ public class Magasin {
 		j.put("stock", stocksJSON());
 		j.put("update", "/magasin/update/" + id);
 		j.put("delete", "/magasin/delete/" + id);
-		
+		j.put("help", "/swagger-ui.html#/magasin-controller");
 		return (j);
 	}
 }

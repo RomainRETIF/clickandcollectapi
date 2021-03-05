@@ -88,6 +88,21 @@ public class Message {
 		this.dateMessage = dateMessage;
 	}
 
+	public JSONObject ajoutToJSON() throws JsonProcessingException {
+		
+	    JSONObject j = new JSONObject();
+		j.put("id", id);
+		j.put("titre", titre);
+		j.put("contenu", contenu);
+		j.put("vendeur", vendeur.getId());
+		j.put("client", client.getId());
+		j.put("dateMessage", dateMessage.toString());
+		j.put("update", "/message/update/" + id);
+		j.put("delete", "/message/delete/" + id);
+		j.put("help", "/swagger-ui.html#/message-controller");
+		return (j);
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
@@ -99,6 +114,7 @@ public class Message {
 		j.put("dateMessage", dateMessage.toString());
 		j.put("update", "/message/update/" + id);
 		j.put("delete", "/message/delete/" + id);
+		j.put("help", "/swagger-ui.html#/message-controller");
 
 		return (j);
 	}

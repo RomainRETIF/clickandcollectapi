@@ -74,6 +74,7 @@ public class Contenir {
 		j.put("idCommande", commandeContenir.getId());
 		j.put("update", "/contenir/update/" + id);
 		j.put("delete", "/contenir/delete/" + id);
+		j.put("help", "/swagger-ui.html#/contenir-controller");
 		return (j);
 	}
 
@@ -92,6 +93,7 @@ public class Contenir {
 		}
 		j.put("update", "/contenir/update/" + id);
 		j.put("delete", "/contenir/delete/" + id);
+		j.put("help", "/swagger-ui.html#/contenir-controller");
 		return (j);
 	}
 }

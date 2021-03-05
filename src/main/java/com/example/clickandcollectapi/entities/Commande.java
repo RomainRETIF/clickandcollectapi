@@ -107,7 +107,7 @@ public class Commande {
         j.put("idUser", user.getId());
 		j.put("update", "/commande/update/" + id);
 		j.put("delete", "/commande/delete/" + id);
-
+		j.put("help", "/swagger-ui.html#/commande-controller");
 		return (j);
 	}
 }

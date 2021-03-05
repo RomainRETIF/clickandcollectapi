@@ -181,6 +181,7 @@ public class User {
 		j.put("messagesClient", messagesClientJSON());
 		j.put("update", "/user/update/" + id);
 		j.put("delete", "/user/delete/" + id);
+		j.put("help", "/swagger-ui.html#/user-controller");
 
 		return (j);
 	}

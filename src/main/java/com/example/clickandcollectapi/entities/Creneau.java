@@ -86,7 +86,7 @@ public class Creneau {
 		magasinJSON.put("nom", magasinCreneau.getNom());
 		magasinJSON.put("codePostal", magasinCreneau.getCodePostal());
 		magasinJSON.put("description", magasinCreneau.getDescription());
-
+		magasinJSON.put("help", "/swagger-ui.html#/creneau-controller");
 		return magasinJSON;
 	}
 
@@ -100,7 +100,7 @@ public class Creneau {
 		j.put("idUser", userCreneau.getId());
 		j.put("delete", "/creneau/update/" + id);
 		j.put("update", "/creneau/delete/" + id);
-
+		j.put("help", "/swagger-ui.html#/creneau-controller");
 		return (j);
 	}
 }

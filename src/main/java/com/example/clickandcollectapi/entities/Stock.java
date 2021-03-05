@@ -68,6 +68,7 @@ public class Stock {
         j.put("idArticle", articleStock.getId());
 		j.put("update", "/stock/update/" + id);
 		j.put("delete", "/stock/delete/" + id);
+		j.put("help", "/swagger-ui.html#/stock-controller");
 		return (j);
 	}
 
@@ -80,6 +81,7 @@ public class Stock {
         j.put("article", articleStock.toJSON());
 		j.put("update", "/stock/update/" + id);
 		j.put("delete", "/stock/delete/" + id);
+		j.put("help", "/swagger-ui.html#/stock-controller");
 		return (j);
 	}
 

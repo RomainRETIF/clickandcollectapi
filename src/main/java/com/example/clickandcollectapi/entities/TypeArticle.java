@@ -68,7 +68,7 @@ public class TypeArticle {
 		j.put("description", description);
 		j.put("update", "/typearticle/update/" + id);
 		j.put("delete", "/typearticle/delete/" + id);
-
+		j.put("help", "/swagger-ui.html#/type-article-controller");
 		return (j);
 	}
 }

@@ -101,6 +101,7 @@ public class Article {
 		}
 		j.put("update", "/article/update/" + id);
 		j.put("delete", "/article/delete/" + id);
+		j.put("help", "/swagger-ui.html#/article-controller");
 
 		return (j);
 	}
