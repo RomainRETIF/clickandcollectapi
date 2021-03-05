@@ -21,11 +21,11 @@ public class Stock {
 
 	@ManyToOne
 	@JoinColumn(name="idMagasinId")
-	private Magasin magasin;
+	private Magasin magasinStock;
 
 	@ManyToOne
 	@JoinColumn(name="idArticleId")
-    private Article article;
+    private Article articleStock;
 
 	public Integer getId() {
 		return id;
@@ -44,19 +44,19 @@ public class Stock {
 	}
 
 	public Magasin getMagasin() {
-		return magasin;
+		return magasinStock;
 	}
 
 	public void setMagasin(Magasin magasin) {
-		this.magasin = magasin;
+		this.magasinStock = magasin;
 	}
 
     public Article getArticle() {
-		return article;
+		return articleStock;
 	}
 
 	public void setArticle(Article article) {
-		this.article = article;
+		this.articleStock = article;
 	}
 
 	public JSONObject toJSON() throws JsonProcessingException {
@@ -64,10 +64,10 @@ public class Stock {
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("quantite", quantite);
-		j.put("magasin", magasin.toJSON());
-        j.put("article", article.toJSON());
-		j.put("update", "/commande/update/" + id);
-		j.put("delete", "/commande/delete/" + id);
+		j.put("magasin", magasinStock.toJSON());
+        j.put("article", articleStock.toJSON());
+		j.put("update", "/stock/update/" + id);
+		j.put("delete", "/stock/delete/" + id);
 		return (j);
 	}
 

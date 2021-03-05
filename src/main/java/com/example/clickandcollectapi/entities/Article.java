@@ -33,11 +33,11 @@ public class Article {
 	@JoinColumn(name="idTypeArticleId")
 	private TypeArticle typeArticle;
 
-	@OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "articleContenir", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Contenir> contenirs;
 
-	@OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "articleStock", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Stock> stocks;
 	

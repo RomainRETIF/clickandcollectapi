@@ -27,11 +27,11 @@ public class Contenir {
 
 	@ManyToOne
 	@JoinColumn(name="idCommandeId")
-	private Commande commande;
+	private Commande commandeContenir;
 
 	@ManyToOne
 	@JoinColumn(name="idArticleId")
-	private Article article;
+	private Article articleContenir;
 
 	public Integer getId() {
 		return id;
@@ -50,19 +50,19 @@ public class Contenir {
 	}
 
 	public Article getArticle() {
-		return article;
+		return articleContenir;
 	}
 
 	public void setArticle(Article article) {
-		this.article = article;
+		this.articleContenir = article;
 	}
 
 	public Commande getCommande() {
-		return commande;
+		return commandeContenir;
 	}
 
 	public void setCommande(Commande commande) {
-		this.commande = commande;
+		this.commandeContenir = commande;
 	}
 
 	public JSONObject toJSON() throws JsonProcessingException {
@@ -70,8 +70,8 @@ public class Contenir {
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("quantite", quantite.toString());
-		j.put("article", article.toJSON());
-		j.put("commande", commande.toJSON());
+		j.put("article", articleContenir.toJSON());
+		j.put("commande", commandeContenir.toJSON());
 		j.put("update", "/contenir/update/" + id);
 		j.put("delete", "/contenir/delete/" + id);
 

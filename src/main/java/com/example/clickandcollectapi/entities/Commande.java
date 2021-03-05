@@ -39,7 +39,7 @@ public class Commande {
 	@JoinColumn(name="idUserId")
     private User user;
 
-	@OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "commandeContenir", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Contenir> contenirs;
 

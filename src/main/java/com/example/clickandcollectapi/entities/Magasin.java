@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Entity // This tells Hibernate to make a table out of this class
@@ -29,24 +30,32 @@ public class Magasin {
 
 	private String description;
 
+	@OneToMany(mappedBy = "magasinCreneau", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Creneau> creneaux;
+
 	@OneToMany(mappedBy = "magasin", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Commande> commandes;
+
+	@OneToMany(mappedBy = "magasinStock", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Stock> stocks;
 	
+	@Column(name = "code_postal")
+	private String codePostal;
+
 	public List<Commande> getCommandes(){
 		return commandes;
 	}
 
-	@OneToMany(mappedBy = "magasin", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Stock> stocks;
-
+	public List<Creneau> getCreneaux(){
+		return creneaux;
+	}
+	
 	public List<Stock> getStocks(){
 		return stocks;
 	}
-
-	@Column(name = "code_postal")
-	private String codePostal;
 
 	public Integer getId() {
 		return id;
@@ -80,6 +89,35 @@ public class Magasin {
 		this.codePostal = codePostal;
 	}
 
+	public JSONArray creneauxJSON() throws JsonProcessingException {
+
+		JSONArray arrayCreneaux = new JSONArray();
+		
+		for(Integer i = 0; i<creneaux.size(); i++){
+			JSONObject creneau = new JSONObject();
+			creneau.put("id", creneaux.get(i).getId());
+			creneau.put("dateCreneau", creneaux.get(i).getDateCreneau());
+			creneau.put("etatCreneau", creneaux.get(i).getEtatCreneau());
+			creneau.put("idUser", creneaux.get(i).getUserCreneau().getId());
+			arrayCreneaux.put(creneau);
+		}
+		return arrayCreneaux;
+	}
+
+	public JSONArray stocksJSON() throws JsonProcessingException {
+
+		JSONArray arrayStocks = new JSONArray();
+		
+		for(Integer i = 0; i<stocks.size(); i++){
+			JSONObject stock = new JSONObject();
+			stock.put("id", stocks.get(i).getId());
+			stock.put("quantite", stocks.get(i).getQuantite());
+			stock.put("article", stocks.get(i).getArticle().toJSON());
+			arrayStocks.put(stock);
+		}
+		return arrayStocks;
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
@@ -87,9 +125,11 @@ public class Magasin {
 		j.put("nom", nom);
 		j.put("description", description);
 		j.put("codePostal", codePostal);
+		j.put("creneaux", creneauxJSON());
+		j.put("stock", stocksJSON());
 		j.put("update", "/magasin/update/" + id);
 		j.put("delete", "/magasin/delete/" + id);
-
+		
 		return (j);
 	}
 }
