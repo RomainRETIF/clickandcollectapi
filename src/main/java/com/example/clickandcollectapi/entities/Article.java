@@ -1,5 +1,8 @@
 package com.example.clickandcollectapi.entities;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +10,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -28,6 +33,17 @@ public class Article {
 	@JoinColumn(name="idTypeArticleId")
 	private TypeArticle typeArticle;
 
+	@OneToMany(mappedBy = "articleContenir", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Contenir> contenirs;
+
+	@OneToMany(mappedBy = "articleStock", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Stock> stocks;
+	
+	public List<Contenir> getContenirs(){
+		return contenirs;
+	}
 
 	public Integer getId() {
 		return id;
@@ -53,15 +69,15 @@ public class Article {
 		this.typeArticle = typeArticle;
 	}
 
-	public String toJSON() throws JsonProcessingException {
+	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("prix", prix.toString());
-		j.put("typeArticle", typeArticle.getId());
+		j.put("typeArticle", typeArticle.toJSON());
 		j.put("update", "/article/update/" + id);
 		j.put("delete", "/article/delete/" + id);
 
-		return (j.toString());
+		return (j);
 	}
 }

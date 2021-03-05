@@ -56,27 +56,11 @@ public class TypeArticleController {
 		Optional<TypeArticle> n = typeArticleRepository.findById(typeArticleId);
 		if(n.isPresent()){
 			TypeArticle typeArticle = n.get();
-			return typeArticle.toJSON();
+			return typeArticle.toJSON().toString();
 		}
 		else{
 			return "Error";
 		}
-		
-	}
-
-	
-	@GetMapping("/test/{typeArticleId}")
-	public @ResponseBody String test(@PathVariable Integer typeArticleId) throws JsonProcessingException {
-		
-		Optional<TypeArticle> n = typeArticleRepository.findById(typeArticleId);
-		if(n.isPresent()){
-			TypeArticle typeArticle = n.get();
-			return typeArticle.getArticles().toString();
-		}
-		else{
-			return "Error";
-		}
-		
 	}
 
 	@DeleteMapping("/delete/{typeArticleId}")  

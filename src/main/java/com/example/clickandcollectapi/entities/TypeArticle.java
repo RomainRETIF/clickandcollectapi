@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -27,6 +28,7 @@ public class TypeArticle {
 
 	private String description;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "typeArticle", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Article> articles;
 
@@ -58,7 +60,7 @@ public class TypeArticle {
 		this.description = description;
 	}
 
-	public String toJSON() throws JsonProcessingException {
+	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
@@ -67,6 +69,6 @@ public class TypeArticle {
 		j.put("update", "/typearticle/update/" + id);
 		j.put("delete", "/typearticle/delete/" + id);
 
-		return (j.toString());
+		return (j);
 	}
 }

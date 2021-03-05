@@ -79,7 +79,7 @@ public class MagasinController {
 		Optional<Magasin> n = magasinRepository.findById(magasinId);
 		if(n.isPresent()){
 			Magasin magasin = n.get();
-			return magasin.toJSON();
+			return magasin.toJSON().toString();
 		}
 		else{
 			return "Error";
