@@ -87,14 +87,24 @@ public class Commande {
 		this.user = user;
 	}
 
+	public JSONObject magasinJSON() throws JsonProcessingException {
+		
+	    JSONObject j = new JSONObject();
+		j.put("id", id);
+		j.put("nom", magasin.getNom());
+		j.put("description", magasin.getDescription());
+		j.put("codePostale", magasin.getCodePostal());
+		return (j);
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("dateCommande", dateCommande);
 		j.put("etatCommande", etatCommande);
-		j.put("magasin", magasin.toJSON());
-        j.put("user", user.toJSON());
+		j.put("magasin", magasinJSON());
+        j.put("idUser", user.getId());
 		j.put("update", "/commande/update/" + id);
 		j.put("delete", "/commande/delete/" + id);
 

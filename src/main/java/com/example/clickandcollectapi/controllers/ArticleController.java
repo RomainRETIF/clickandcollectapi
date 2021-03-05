@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.clickandcollectapi.entities.Article;
+import com.example.clickandcollectapi.entities.Stock;
 import com.example.clickandcollectapi.entities.TypeArticle;
 import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.example.clickandcollectapi.repositories.TypeArticleRepository;
@@ -49,7 +50,10 @@ public class ArticleController {
 			return typeArticle.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/article-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -61,27 +65,50 @@ public class ArticleController {
 		articleRepository.deleteById(articleId);
 	}
 	
-	@PutMapping("/update/{articleId}")  
-	private @ResponseBody String update(@PathVariable("articleId") Integer articleId, @RequestParam Double prix, @RequestParam Integer idTypeArticle)   
+	@RequestMapping(value = { "/", "/update/{articleId}" }, method = RequestMethod.PUT, produces = "application/json") 
+	private @ResponseBody String update(@PathVariable("articleId") Integer articleId, @RequestParam(required = false) Double prix, @RequestParam(required = false) Integer idTypeArticle)
+			throws JsonProcessingException 
 	{  
 		Optional<Article> n = articleRepository.findById(articleId);
 		if(n.isPresent()){
 			Article article = n.get();
-			article.setPrix(prix);
-			TypeArticle ta = new TypeArticle();
-			ta.setId(idTypeArticle);
-			article.setTypeArticle(ta);
-			articleRepository.save(article);
-			return "Saved";
+			if(prix != null)
+			{
+				article.setPrix(prix);
+			}
+			if(idTypeArticle != null)
+			{
+				TypeArticle ta = new TypeArticle();
+				ta.setId(idTypeArticle);
+				article.setTypeArticle(ta);
+			}
+			if(prix != null || idTypeArticle != null)
+			{
+				articleRepository.save(article);
+				return article.toJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("article", article.toJSON());
+				return JSONInfo.toString();
+			}
+			
 		}
-		else{
-			return "Error";
+		else
+		{
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/article-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
 
-	@PostMapping(path = "/add") // Map ONLY POST Requests
-	public @ResponseBody String addNewArticle(@RequestParam Double prix, @RequestParam Integer idTypeArticle) {
+	@RequestMapping(value = { "/", "/add" }, method = RequestMethod.POST, produces = "application/json") 
+	public @ResponseBody String addNewArticle(@RequestParam Double prix, @RequestParam Integer idTypeArticle)
+			throws JsonProcessingException {
 		
 		Article n = new Article();
 		n.setPrix(prix);
@@ -89,6 +116,6 @@ public class ArticleController {
 		ta.setId(idTypeArticle);
 		n.setTypeArticle(ta);
 		articleRepository.save(n);
-		return "Saved";
+		return n.toJSON().toString();
 	}
 }

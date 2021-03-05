@@ -65,16 +65,33 @@ public class Contenir {
 		this.commandeContenir = commande;
 	}
 
+	public JSONObject ajoutToJSON() throws JsonProcessingException {
+		
+	    JSONObject j = new JSONObject();
+		j.put("id", id);
+		j.put("quantite", quantite.toString());
+		j.put("idArticle", articleContenir.getId());
+		j.put("idCommande", commandeContenir.getId());
+		j.put("update", "/contenir/update/" + id);
+		j.put("delete", "/contenir/delete/" + id);
+		return (j);
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
 		j.put("quantite", quantite.toString());
-		j.put("article", articleContenir.toJSON());
-		j.put("commande", commandeContenir.toJSON());
+		if(articleContenir.toJSON() != null)
+		{
+			j.put("article", articleContenir.toJSON());
+		}
+		if(commandeContenir != null)
+		{
+			j.put("commande", commandeContenir.toJSON());
+		}
 		j.put("update", "/contenir/update/" + id);
 		j.put("delete", "/contenir/delete/" + id);
-
 		return (j);
 	}
 }

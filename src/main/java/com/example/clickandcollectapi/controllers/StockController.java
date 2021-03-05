@@ -40,7 +40,7 @@ public class StockController {
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
 	public @ResponseBody String addNewStock(@RequestParam Integer quantite,
-    @RequestParam Integer idMagasin,@RequestParam Integer idArticle) {
+    @RequestParam Integer idMagasin,@RequestParam Integer idArticle) throws JsonProcessingException {
 		
 		Stock n = new Stock();
         Article a = new Article();
@@ -51,7 +51,7 @@ public class StockController {
 		n.setMagasin(m);
         n.setArticle(a);
 		stockRepository.save(n);
-		return "Saved";
+		return n.toJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
@@ -61,15 +61,17 @@ public class StockController {
 	}
 
 	@RequestMapping(value = { "/", "/{stockId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findCommandeById(@PathVariable Integer stockId) throws JsonProcessingException {
-		
+	public @ResponseBody String findStockById(@PathVariable Integer stockId) throws JsonProcessingException {
 		Optional<Stock> n = stockRepository.findById(stockId);
 		if(n.isPresent()){
 			Stock stock = n.get();
 			return stock.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/stock-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -81,26 +83,49 @@ public class StockController {
 		stockRepository.deleteById(stockId);
 	}
 
-	@PutMapping("/update/{stockId}")  
+	@RequestMapping(value = { "/", "/update/{stockId}" }, method = RequestMethod.PUT, produces = "application/json")
 	private @ResponseBody String update(@PathVariable("stockId") Integer stockId,
-	@RequestParam Integer quantite,@RequestParam Integer idMagasin,
-    @RequestParam Integer idArticle)   
+	@RequestParam(required = false) Integer quantite,@RequestParam(required = false) Integer idMagasin,
+    @RequestParam(required = false) Integer idArticle) throws JsonProcessingException 
 	{  
 		Optional<Stock> n = stockRepository.findById(stockId);
 		if(n.isPresent()){
 			Stock stock = n.get();
-			Article a = new Article();
-            Magasin m = new Magasin();
-			m.setId(idMagasin);
-			a.setId(idArticle);
-            stock.setQuantite(quantite);
-            stock.setMagasin(m);
-            stock.setArticle(a);
-			stockRepository.save(stock);
-			return "Saved";
+			if(idMagasin != null)
+			{
+				Magasin m = new Magasin();
+				m.setId(idMagasin);
+				stock.setMagasin(m);
+			}
+			if(idArticle != null)
+			{
+				Article a = new Article();
+				a.setId(idArticle);
+				stock.setArticle(a);
+			}
+			if(quantite != null)
+			{
+				stock.setQuantite(quantite);
+			}
+            if(idMagasin != null || idArticle != null || quantite != null)
+			{
+				stockRepository.save(stock);
+				return stock.toJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("stock", stock.toJSON());
+				return JSONInfo.toString();
+			}
+			
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/stock-controller");
+			return JSONErreur.toString();
 		}
 		
 	}  

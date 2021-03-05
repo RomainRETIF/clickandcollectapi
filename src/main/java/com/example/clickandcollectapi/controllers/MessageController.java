@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import ch.qos.logback.core.joran.conditional.ElseAction;
+
 @Controller // This means that this class is a Controller
 @RequestMapping(path = "/message") // This means URL's start with /demo (after Application path)
 public class MessageController {
@@ -34,23 +36,14 @@ public class MessageController {
 	private MessageRepository messageRepository;
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
-	public @ResponseBody String addNewMessage(@RequestParam(required = false) String titre, @RequestParam(required = false) String contenu, @RequestParam Integer idClient, @RequestParam Integer idVendeur) {
+	public @ResponseBody String addNewMessage(@RequestParam String titre, @RequestParam String contenu, @RequestParam Integer idClient, @RequestParam Integer idVendeur)
+			throws JsonProcessingException {
 		// @ResponseBody means the returned String is the response, not a view name
 		// @RequestParam means it is a parameter from the GET or POST request
 
 		Message n = new Message();
-		if(titre != null){
-			n.setTitre(titre);
-		}
-		else{
-			n.setTitre("");
-		}
-		if(contenu != null){
-			n.setContenu(contenu);
-		}
-		else{
-			n.setContenu("");
-		}
+		n.setTitre(titre);
+		n.setContenu(contenu);
 		n.setDateMessage(new Date());
 
 		User vendeur = new User();
@@ -63,7 +56,7 @@ public class MessageController {
 		n.setVendeur(vendeur);
 
 		messageRepository.save(n);
-		return "Saved";
+		return n.toJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
@@ -83,7 +76,10 @@ public class MessageController {
 			return message.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/message-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -94,8 +90,9 @@ public class MessageController {
 		messageRepository.deleteById(messageId);
 	}
 
-	@PutMapping("/update/{messageId}")  
-	private @ResponseBody String update(@PathVariable("messageId") Integer messageId, @RequestParam(required = false) String titre, @RequestParam(required = false) String contenu, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idVendeur)   
+	@RequestMapping(value = { "/", "/update/{messageId}" }, method = RequestMethod.PUT, produces = "application/json")
+	private @ResponseBody String update(@PathVariable("messageId") Integer messageId, @RequestParam(required = false) String titre, @RequestParam(required = false) String contenu, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idVendeur)
+			throws JsonProcessingException 
 	{  
 		Optional<Message> n = messageRepository.findById(messageId);
 		if(n.isPresent()){
@@ -116,11 +113,25 @@ public class MessageController {
 				vendeur.setId(idVendeur);
 				message.setVendeur(vendeur);
 			}
-			messageRepository.save(message);
-			return "Saved";
+			if(titre != null || contenu != null || idClient != null || idVendeur != null)
+			{
+				messageRepository.save(message);
+				return message.toJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("stock", message.toJSON());
+				return JSONInfo.toString();
+			}
+			
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/message-controller");
+			return JSONErreur.toString();
 		}
 		
 	}  

@@ -41,9 +41,9 @@ public class ContenirController {
 	@Autowired
 	private CommandeRepository commandeRepository;
 
-	@PostMapping(path = "/add") // Map ONLY POST Requests
+	@RequestMapping(value = { "/", "/add" }, method = RequestMethod.POST, produces = "application/json") 
 	public @ResponseBody String addNewCommande(@RequestParam Integer quantite,
-    @RequestParam Integer idArticle,@RequestParam Integer idCommande) {
+    @RequestParam Integer idArticle,@RequestParam Integer idCommande) throws JsonProcessingException {
 		
 		Contenir n = new Contenir();
         Article a = new Article();
@@ -54,7 +54,7 @@ public class ContenirController {
         n.setArticle(a);
         n.setCommande(c);
 		contenirRepository.save(n);
-		return "Saved";
+		return n.ajoutToJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
@@ -73,7 +73,10 @@ public class ContenirController {
 			return contenir.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -84,26 +87,50 @@ public class ContenirController {
 		contenirRepository.deleteById(contenirId);
 	}
 
-	@PutMapping("/update/{contenirId}")  
+	@RequestMapping(value = { "/", "/update/{contenirId}" }, method = RequestMethod.PUT, produces = "application/json") 
 	private @ResponseBody String update(@PathVariable("contenirId") Integer contenirId,
-	@RequestParam Integer quantite,@RequestParam Integer idArticle,
-	@RequestParam Integer idCommande)
+	@RequestParam(required = false) Integer quantite,@RequestParam(required = false) Integer idArticle,
+	@RequestParam(required = false) Integer idCommande) throws JsonProcessingException
 	{  
 		Optional<Contenir> n = contenirRepository.findById(contenirId);
 		if(n.isPresent()){
 			Contenir contenir = n.get();
-			Article a = new Article();
-        	Commande c = new Commande();
-			a.setId(idArticle);
-			c.setId(idCommande);
-			contenir.setQuantite(quantite);
-        	contenir.setArticle(a);
-        	contenir.setCommande(c);
-			contenirRepository.save(contenir);
-			return "Saved";
+			if(idArticle != null)
+			{
+				Article a = new Article();
+				a.setId(idArticle);
+				contenir.setArticle(a);
+			}
+			if(idCommande != null)
+			{
+				Commande c = new Commande();
+				c.setId(idCommande);
+				contenir.setCommande(c);
+			}
+        	if(quantite != null)
+			{
+				contenir.setQuantite(quantite);
+			}			
+        	if(idArticle != null || idCommande != null || quantite != null)
+			{
+				contenirRepository.save(contenir);
+				return contenir.ajoutToJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("contenir", contenir.ajoutToJSON());
+				return JSONInfo.toString();
+			}
+        	
+			
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
+			return JSONErreur.toString();
 		}
 		
 	}  

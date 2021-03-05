@@ -35,17 +35,18 @@ public class TypeArticleController {
 	private ArticleRepository articleRepository;
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
-	public @ResponseBody String addNewTypeArticle(@RequestParam String libelle, @RequestParam String description) {
+	public @ResponseBody String addNewTypeArticle(@RequestParam String libelle, @RequestParam String description)
+			throws JsonProcessingException {
 		
 		TypeArticle n = new TypeArticle();
 		n.setlibelle(libelle);
 		n.setDescription(description);
 		typeArticleRepository.save(n);
-		return "Saved";
+		return n.toJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
-	public @ResponseBody Iterable<TypeArticle> getAllMagasins() {
+	public @ResponseBody Iterable<TypeArticle> getAllTypeArticles() {
 		// This returns a JSON or XML with the users
 		return typeArticleRepository.findAll();
 	}
@@ -59,7 +60,10 @@ public class TypeArticleController {
 			return typeArticle.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/type-article-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -71,19 +75,41 @@ public class TypeArticleController {
 		typeArticleRepository.deleteById(typeArticleId);
 	}
 
-	@PutMapping("/update/{typeArticleId}")  
-	private @ResponseBody String update(@PathVariable("typeArticleId") Integer typeArticleId, @RequestParam String libelle, @RequestParam String description)   
+	@RequestMapping(value = { "/", "/update/{typeArticleId}" }, method = RequestMethod.PUT, produces = "application/json")
+	private @ResponseBody String update(@PathVariable("typeArticleId") Integer typeArticleId,
+	 @RequestParam(required = false) String libelle,
+	 @RequestParam(required = false) String description) throws JsonProcessingException 
 	{  
 		Optional<TypeArticle> n = typeArticleRepository.findById(typeArticleId);
 		if(n.isPresent()){
 			TypeArticle typeArticle = n.get();
-			typeArticle.setlibelle(libelle);
-			typeArticle.setDescription(description);
-			typeArticleRepository.save(typeArticle);
-			return "Saved";
+			if(libelle != null)
+			{
+				typeArticle.setlibelle(libelle);
+			}
+			if(description != null)
+			{
+				typeArticle.setDescription(description);
+			}
+			if(libelle != null || description != null)
+			{
+				typeArticleRepository.save(typeArticle);
+				return typeArticle.toJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("typeArticle", typeArticle.toJSON());
+				return JSONInfo.toString();
+			}
+			
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/type-article-controller/");
+			return JSONErreur.toString();
 		}
 		
 	}  

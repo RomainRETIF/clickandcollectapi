@@ -60,7 +60,7 @@ public class TypeArticle {
 		this.description = description;
 	}
 
-	public String toJSON() throws JsonProcessingException {
+	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
@@ -69,6 +69,6 @@ public class TypeArticle {
 		j.put("update", "/typearticle/update/" + id);
 		j.put("delete", "/typearticle/delete/" + id);
 
-		return (j.toString());
+		return (j);
 	}
 }

@@ -33,31 +33,16 @@ public class MagasinController {
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
 	public @ResponseBody String addNewMagasin(@RequestParam(required = false) String name, @RequestParam(required = false) String description,
-			@RequestParam(required = false) String codePostal) {
+			@RequestParam(required = false) String codePostal) throws JsonProcessingException {
 		// @ResponseBody means the returned String is the response, not a view name
 		// @RequestParam means it is a parameter from the GET or POST request
 
 		Magasin n = new Magasin();
-		if(name != null){
-			n.setNom(name);
-		}
-		else{
-			n.setNom("");
-		}
-		if(description != null){
-			n.setDescription(description);
-		}
-		else{
-			n.setDescription("");
-		}
-		if(codePostal != null){
-			n.setCodePostal(codePostal);
-		}
-		else{
-			n.setCodePostal("");
-		}
+		n.setNom(name);
+		n.setDescription(description);
+		n.setCodePostal(codePostal);
 		magasinRepository.save(n);
-		return "Saved";
+		return n.toJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
@@ -82,7 +67,10 @@ public class MagasinController {
 			return magasin.toJSON().toString();
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
+			return JSONErreur.toString();
 		}
 		
 	}
@@ -93,8 +81,9 @@ public class MagasinController {
 		magasinRepository.deleteById(magasinId);
 	}
 
-	@PutMapping("/update/{magasinId}")  
-	private @ResponseBody String update(@PathVariable("magasinId") Integer magasinId, @RequestParam(required = false) String nom, @RequestParam(required = false) String description, @RequestParam(required = false) String codePostal)   
+	@RequestMapping(value = { "/", "/update/{magasinId}" }, method = RequestMethod.PUT, produces = "application/json")
+	private @ResponseBody String update(@PathVariable("magasinId") Integer magasinId, @RequestParam(required = false) String nom, @RequestParam(required = false) String description, @RequestParam(required = false) String codePostal)
+			throws JsonProcessingException 
 	{  
 		Optional<Magasin> n = magasinRepository.findById(magasinId);
 		if(n.isPresent()){
@@ -108,11 +97,25 @@ public class MagasinController {
 			if(codePostal != null){
 				magasin.setCodePostal(codePostal);
 			}
-			magasinRepository.save(magasin);
-			return "Saved";
+			if(nom != null || description != null || codePostal != null)
+			{
+				magasinRepository.save(magasin);
+				return magasin.toJSON().toString();
+			}
+			else
+			{
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("message", "Aucune modification nécéssaire");
+				JSONInfo.put("stock", magasin.toJSON());
+				return JSONInfo.toString();
+			}
+			
 		}
 		else{
-			return "Error";
+			JSONObject JSONErreur = new JSONObject();
+			JSONErreur.put("message", "Error");
+			JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
+			return JSONErreur.toString();
 		}
 		
 	}  
