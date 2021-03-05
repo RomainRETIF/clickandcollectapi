@@ -48,10 +48,24 @@ public class UserController {
 		return "Saved";
 	}
 
+	
 	@GetMapping(path = "/all")
 	public @ResponseBody Iterable<User> getAllUsers() {
 		// This returns a JSON or XML with the users
 		return userRepository.findAll();
+	}
+
+	@RequestMapping(value = { "/login" }, method = RequestMethod.GET, produces = "application/json")
+	public @ResponseBody String loginUser(@RequestParam(required = true) String email, @RequestParam(required = true) String password) throws JsonProcessingException {
+		Optional<User> n = userRepository.findByEmailAndPassword(email, password);
+		if(n.isPresent()){
+			User user = n.get();
+			return user.toJSON().toString();
+		}
+		else{
+
+			return new JSONObject().put("error", "user not found").put("help", "/swagger-ui.html#/user-controller").toString();
+		}
 	}
 
 	@RequestMapping(value = { "/", "/{userId}" }, method = RequestMethod.GET, produces = "application/json")
@@ -100,7 +114,6 @@ public class UserController {
             user.setVerified(isVerified);
             userRepository.save(user);
 			JSONObject JSONInfo = new JSONObject();
-			JSONInfo.put("message", "Aucune modification nécéssaire");
 			JSONInfo.put("user", user.toJSON());
 			return JSONInfo.toString();
 		}

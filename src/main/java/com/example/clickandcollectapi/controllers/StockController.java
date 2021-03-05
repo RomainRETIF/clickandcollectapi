@@ -39,6 +39,7 @@ public class StockController {
     private ArticleRepository articleRepository;
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
+	@RequestMapping(value = { "/", "/add" }, method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody String addNewStock(@RequestParam Integer quantite,
     @RequestParam Integer idMagasin,@RequestParam Integer idArticle) throws JsonProcessingException {
 		
@@ -51,7 +52,7 @@ public class StockController {
 		n.setMagasin(m);
         n.setArticle(a);
 		stockRepository.save(n);
-		return n.toJSON().toString();
+		return n.stockAjoutJSON().toString();
 	}
 
 	@GetMapping(path = "/all")
@@ -110,13 +111,13 @@ public class StockController {
             if(idMagasin != null || idArticle != null || quantite != null)
 			{
 				stockRepository.save(stock);
-				return stock.toJSON().toString();
+				return stock.stockAjoutJSON().toString();
 			}
 			else
 			{
 				JSONObject JSONInfo = new JSONObject();
 				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("stock", stock.toJSON());
+				JSONInfo.put("stock", stock.stockAjoutJSON());
 				return JSONInfo.toString();
 			}
 			

@@ -59,6 +59,18 @@ public class Stock {
 		this.articleStock = article;
 	}
 
+	public JSONObject stockAjoutJSON() throws JsonProcessingException {
+		
+	    JSONObject j = new JSONObject();
+		j.put("id", id);
+		j.put("quantite", quantite);
+		j.put("idMagasin", magasinStock.getId());
+        j.put("idArticle", articleStock.getId());
+		j.put("update", "/stock/update/" + id);
+		j.put("delete", "/stock/delete/" + id);
+		return (j);
+	}
+
 	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();

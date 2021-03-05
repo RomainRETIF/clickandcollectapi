@@ -35,6 +35,7 @@ public class TypeArticleController {
 	private ArticleRepository articleRepository;
 
 	@PostMapping(path = "/add") // Map ONLY POST Requests
+	@RequestMapping(value = { "/", "/add" }, method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody String addNewTypeArticle(@RequestParam String libelle, @RequestParam String description)
 			throws JsonProcessingException {
 		
