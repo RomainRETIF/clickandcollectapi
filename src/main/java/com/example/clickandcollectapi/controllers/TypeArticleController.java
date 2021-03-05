@@ -56,7 +56,7 @@ public class TypeArticleController {
 		Optional<TypeArticle> n = typeArticleRepository.findById(typeArticleId);
 		if(n.isPresent()){
 			TypeArticle typeArticle = n.get();
-			return typeArticle.toJSON();
+			return typeArticle.toJSON().toString();
 		}
 		else{
 			return "Error";

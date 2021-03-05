@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -28,6 +29,7 @@ public class TypeArticle {
 	private String description;
 
 	@OneToMany(mappedBy = "typeArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Article> articles;
 
 	public List<Article> getArticles(){

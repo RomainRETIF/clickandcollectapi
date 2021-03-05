@@ -1,11 +1,16 @@
 package com.example.clickandcollectapi.entities;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -23,6 +28,22 @@ public class Magasin {
 	private String nom;
 
 	private String description;
+
+	@OneToMany(mappedBy = "magasin", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Commande> commandes;
+	
+	public List<Commande> getCommandes(){
+		return commandes;
+	}
+
+	@OneToMany(mappedBy = "magasin", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Stock> stocks;
+
+	public List<Stock> getStocks(){
+		return stocks;
+	}
 
 	@Column(name = "code_postal")
 	private String codePostal;
@@ -59,7 +80,7 @@ public class Magasin {
 		this.codePostal = codePostal;
 	}
 
-	public String toJSON() throws JsonProcessingException {
+	public JSONObject toJSON() throws JsonProcessingException {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
@@ -69,6 +90,6 @@ public class Magasin {
 		j.put("update", "/magasin/update/" + id);
 		j.put("delete", "/magasin/delete/" + id);
 
-		return (j.toString());
+		return (j);
 	}
 }
