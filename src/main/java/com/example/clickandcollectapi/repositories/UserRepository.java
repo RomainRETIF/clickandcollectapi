@@ -10,5 +10,6 @@ import com.example.clickandcollectapi.entities.User;
 // CRUD refers Create, Read, Update, Delete
 
 public interface UserRepository extends CrudRepository<User, Integer> {
-    Optional<User> findByEmailAndPassword(String email, String password);
+    Optional<User> findByUsernameAndPassword(String email, String password);
+    Optional<User> findByUsername(String email);
 }

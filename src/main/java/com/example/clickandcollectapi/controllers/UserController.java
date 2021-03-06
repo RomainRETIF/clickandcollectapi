@@ -57,7 +57,7 @@ public class UserController {
 
 	@RequestMapping(value = { "/login" }, method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody String loginUser(@RequestParam(required = true) String email, @RequestParam(required = true) String password) throws JsonProcessingException {
-		Optional<User> n = userRepository.findByEmailAndPassword(email, password);
+		Optional<User> n = userRepository.findByUsernameAndPassword(email, password);
 		if(n.isPresent()){
 			User user = n.get();
 			return user.toJSON().toString();

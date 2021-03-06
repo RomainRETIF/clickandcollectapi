@@ -25,7 +25,7 @@ public class User {
 	
 	private Integer id;
 
-	private String email;
+	private String username;
 
 	private String roles;
 
@@ -75,11 +75,11 @@ public class User {
 	}
 
 	public String getEmail() {
-		return email;
+		return username;
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		this.username = email;
 	}
 
 	public String getRoles() {
@@ -171,7 +171,7 @@ public class User {
 		
 	    JSONObject j = new JSONObject();
 		j.put("id", id);
-		j.put("email", email);
+		j.put("email", username);
 		j.put("roles", roles);
 		j.put("password", password);
         j.put("isVerified", isVerified);
