@@ -5,6 +5,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.clickandcollectapi.entities.Magasin;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.MagasinRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -54,11 +56,19 @@ public class MagasinController {
 	@GetMapping("/search/{magasinCodePostal}")  
 	private @ResponseBody Iterable<Magasin> searchMagasins(@PathVariable("magasinCodePostal") String magasinCodePostal)   
 	{  
-		return magasinRepository.findByCodePostalIs(magasinCodePostal);
+		if(!magasinRepository.findByCodePostalIs(magasinCodePostal).isEmpty())
+		{
+			return magasinRepository.findByCodePostalIs(magasinCodePostal);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException("/ CP '"+magasinCodePostal+"';/swagger-ui.html#/magasin-controller");
+		}
+		
 	}
 
 	@RequestMapping(value = { "/", "/{magasinId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findMagasinById(@PathVariable Integer magasinId) throws JsonProcessingException {
+	public @ResponseBody String findMagasinById(@PathVariable Integer magasinId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		
 		Optional<Magasin> n = magasinRepository.findById(magasinId);
@@ -67,10 +77,11 @@ public class MagasinController {
 			return magasin.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(magasinId)+";/swagger-ui.html#/magasin-controller");
 		}
 		
 	}
@@ -78,12 +89,19 @@ public class MagasinController {
 	@DeleteMapping("/delete/{magasinId}")  
 	private void deleteMagasin(@PathVariable("magasinId") Integer magasinId)   
 	{  
-		magasinRepository.deleteById(magasinId);
+		if(magasinRepository.findById(magasinId).isPresent())
+		{
+			magasinRepository.deleteById(magasinId);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException(Integer.toString(magasinId)+";/swagger-ui.html#/magasin-controller");
+		}
 	}
 
 	@RequestMapping(value = { "/", "/update/{magasinId}" }, method = RequestMethod.PUT, produces = "application/json")
 	private @ResponseBody String update(@PathVariable("magasinId") Integer magasinId, @RequestParam(required = false) String nom, @RequestParam(required = false) String description, @RequestParam(required = false) String codePostal)
-			throws JsonProcessingException 
+			throws JsonProcessingException,RessourceBadRequestException 
 	{  
 		Optional<Magasin> n = magasinRepository.findById(magasinId);
 		if(n.isPresent()){
@@ -104,18 +122,20 @@ public class MagasinController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("stock", magasin.ajoutToJSON());
-				return JSONInfo.toString();
+				// JSONObject JSONInfo = new JSONObject();
+				// JSONInfo.put("message", "Aucune modification nécéssaire");
+				// JSONInfo.put("stock", magasin.ajoutToJSON());
+				// return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(magasinId)+";/swagger-ui.html#/magasin-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/magasin-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(magasinId)+";/swagger-ui.html#/magasin-controller");
 		}
 		
 	}  

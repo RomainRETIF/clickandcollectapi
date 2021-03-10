@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.example.clickandcollectapi.entities.Article;
 import com.example.clickandcollectapi.entities.TypeArticle;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.example.clickandcollectapi.repositories.TypeArticleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -53,7 +55,7 @@ public class TypeArticleController {
 	}
 
 	@RequestMapping(value = { "/", "/{typeArticleId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findTypeArticleById(@PathVariable Integer typeArticleId) throws JsonProcessingException {
+	public @ResponseBody String findTypeArticleById(@PathVariable Integer typeArticleId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		Optional<TypeArticle> n = typeArticleRepository.findById(typeArticleId);
 		if(n.isPresent()){
@@ -61,10 +63,7 @@ public class TypeArticleController {
 			return typeArticle.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/type-article-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(typeArticleId)+";/swagger-ui.html#/type-article-controller");
 		}
 		
 	}
@@ -73,7 +72,12 @@ public class TypeArticleController {
 	@DeleteMapping("/delete/{typeArticleId}")  
 	private void deleteTypeArticle(@PathVariable("typeArticleId") Integer typeArticleId)   
 	{  
-		typeArticleRepository.deleteById(typeArticleId);
+		if(typeArticleRepository.findById(typeArticleId).isPresent()){
+			typeArticleRepository.deleteById(typeArticleId);
+		}
+		else{
+			throw new RessourceIntrouvableException(Integer.toString(typeArticleId)+";/swagger-ui.html#/type-article-controller");
+		}
 	}
 
 	@RequestMapping(value = { "/", "/update/{typeArticleId}" }, method = RequestMethod.PUT, produces = "application/json")
@@ -99,18 +103,12 @@ public class TypeArticleController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("typeArticle", typeArticle.toJSON());
-				return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(typeArticleId)+";/swagger-ui.html#/type-article-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/type-article-controller/");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(typeArticleId)+";/swagger-ui.html#/type-article-controller");
 		}
 		
 	}  

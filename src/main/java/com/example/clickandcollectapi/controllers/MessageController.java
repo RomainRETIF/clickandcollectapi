@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.example.clickandcollectapi.entities.Message;
 import com.example.clickandcollectapi.entities.User;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.MessageRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -68,7 +70,7 @@ public class MessageController {
 
 
 	@RequestMapping(value = { "/", "/{messageId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findMessageById(@PathVariable Integer messageId) throws JsonProcessingException {
+	public @ResponseBody String findMessageById(@PathVariable Integer messageId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		
 		Optional<Message> n = messageRepository.findById(messageId);
@@ -77,10 +79,7 @@ public class MessageController {
 			return message.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/message-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(messageId)+";/swagger-ui.html#/message-controller");
 		}
 		
 	}
@@ -88,7 +87,12 @@ public class MessageController {
 	@DeleteMapping("/delete/{messageId}")  
 	private void deleteMessage(@PathVariable("messageId") Integer messageId)   
 	{  
-		messageRepository.deleteById(messageId);
+		if(messageRepository.findById(messageId).isPresent()){
+			messageRepository.deleteById(messageId);
+		}
+		else{
+			throw new RessourceIntrouvableException(Integer.toString(messageId)+";/swagger-ui.html#/message-controller");
+		}
 	}
 
 	@RequestMapping(value = { "/", "/update/{messageId}" }, method = RequestMethod.PUT, produces = "application/json")
@@ -121,18 +125,12 @@ public class MessageController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("stock", message.ajoutToJSON());
-				return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(messageId)+";/swagger-ui.html#/message-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/message-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(messageId)+";/swagger-ui.html#/message-controller");
 		}
 		
 	}  

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.clickandcollectapi.entities.Article;
 import com.example.clickandcollectapi.entities.Commande;
 import com.example.clickandcollectapi.entities.TypeArticle;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.example.clickandcollectapi.repositories.CommandeRepository;
 import com.example.clickandcollectapi.repositories.TypeArticleRepository;
@@ -64,7 +66,7 @@ public class ContenirController {
 	}
 
 	@RequestMapping(value = { "/", "/{contenirId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findContenirById(@PathVariable Integer contenirId) throws JsonProcessingException {
+	public @ResponseBody String findContenirById(@PathVariable Integer contenirId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		
 		Optional<Contenir> n = contenirRepository.findById(contenirId);
@@ -73,10 +75,11 @@ public class ContenirController {
 			return contenir.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(contenirId)+";/swagger-ui.html#/contenir-controller");
 		}
 		
 	}
@@ -84,13 +87,21 @@ public class ContenirController {
 	@DeleteMapping("/delete/{contenirId}")  
 	private void deleteContenir(@PathVariable("contenirId") Integer contenirId)
 	{  
-		contenirRepository.deleteById(contenirId);
+		if(contenirRepository.findById(contenirId).isPresent())
+		{
+			contenirRepository.deleteById(contenirId);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException(Integer.toString(contenirId)+";/swagger-ui.html#/contenir-controller");
+		}
+		
 	}
 
 	@RequestMapping(value = { "/", "/update/{contenirId}" }, method = RequestMethod.PUT, produces = "application/json") 
 	private @ResponseBody String update(@PathVariable("contenirId") Integer contenirId,
 	@RequestParam(required = false) Integer quantite,@RequestParam(required = false) Integer idArticle,
-	@RequestParam(required = false) Integer idCommande) throws JsonProcessingException
+	@RequestParam(required = false) Integer idCommande) throws JsonProcessingException,RessourceBadRequestException
 	{  
 		Optional<Contenir> n = contenirRepository.findById(contenirId);
 		if(n.isPresent()){
@@ -118,19 +129,21 @@ public class ContenirController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("contenir", contenir.ajoutToJSON());
-				return JSONInfo.toString();
+				// JSONObject JSONInfo = new JSONObject();
+				// JSONInfo.put("message", "Aucune modification nécéssaire");
+				// JSONInfo.put("contenir", contenir.ajoutToJSON());
+				// return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(contenirId)+";/swagger-ui.html#/contenir-controller");
 			}
         	
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/contenir-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(contenirId)+";/swagger-ui.html#/contenir-controller");
 		}
 		
 	}  

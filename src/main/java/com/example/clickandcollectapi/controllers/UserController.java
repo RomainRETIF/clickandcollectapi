@@ -5,6 +5,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.clickandcollectapi.entities.User;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -56,7 +58,7 @@ public class UserController {
 	}
 
 	@RequestMapping(value = { "/login" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String loginUser(@RequestParam(required = true) String email, @RequestParam(required = true) String password) throws JsonProcessingException {
+	public @ResponseBody String loginUser(@RequestParam(required = true) String email, @RequestParam(required = true) String password) throws JsonProcessingException, RessourceIntrouvableException {
 		Optional<User> n = userRepository.findByUsernameAndPassword(email, password);
 		if(n.isPresent()){
 			User user = n.get();
@@ -64,29 +66,31 @@ public class UserController {
 		}
 		else{
 
-			return new JSONObject().put("error", "user not found").put("help", "/swagger-ui.html#/user-controller").toString();
+			throw new RessourceIntrouvableException("/ username '" + email +"' and password '" + password +"';/swagger-ui.html#/user-controller");
 		}
 	}
 
 	@RequestMapping(value = { "/", "/{userId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findUserById(@PathVariable Integer userId) throws JsonProcessingException {
+	public @ResponseBody String findUserById(@PathVariable Integer userId) throws JsonProcessingException, RessourceIntrouvableException {
 
 		Optional<User> n = userRepository.findById(userId);
 		if (n.isPresent()) {
 			User user = n.get();
 			return user.toJSON().toString();
 		} else {
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/user-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(userId)+";/swagger-ui.html#/user-controller");
 		}
 
 	}
 
 	@DeleteMapping("/delete/{userId}")
 	private void deleteUser(@PathVariable("userId") Integer userId) {
-		userRepository.deleteById(userId);
+		if (userRepository.findById(userId).isPresent()){
+			userRepository.deleteById(userId);
+		}
+		else{
+			throw new RessourceIntrouvableException(Integer.toString(userId)+";/swagger-ui.html#/user-controller");
+		}
 	}
 
 	// @PutMapping("/update/{userId}")
@@ -111,17 +115,19 @@ public class UserController {
 			{
 				user.setPassword(password);
 			}
-            user.setVerified(isVerified);
-            userRepository.save(user);
-			JSONObject JSONInfo = new JSONObject();
-			JSONInfo.put("user", user.toJSON());
-			return JSONInfo.toString();
+			if(email != null || roles != null || password != null){
+				user.setVerified(isVerified);
+				userRepository.save(user);
+				JSONObject JSONInfo = new JSONObject();
+				JSONInfo.put("user", user.toJSON());
+				return JSONInfo.toString();
+			}
+			else{
+				throw new RessourceBadRequestException(Integer.toString(userId)+";/swagger-ui.html#/user-controller");
+			}   
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/user-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(userId)+";/swagger-ui.html#/user-controller");
 		}
 		
 	}  

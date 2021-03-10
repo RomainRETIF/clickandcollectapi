@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.clickandcollectapi.entities.Article;
 import com.example.clickandcollectapi.entities.Magasin;
 import com.example.clickandcollectapi.entities.Stock;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.example.clickandcollectapi.repositories.MagasinRepository;
 import com.example.clickandcollectapi.repositories.StockRepository;
@@ -62,17 +64,14 @@ public class StockController {
 	}
 
 	@RequestMapping(value = { "/", "/{stockId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findStockById(@PathVariable Integer stockId) throws JsonProcessingException {
+	public @ResponseBody String findStockById(@PathVariable Integer stockId) throws JsonProcessingException, RessourceIntrouvableException {
 		Optional<Stock> n = stockRepository.findById(stockId);
 		if(n.isPresent()){
 			Stock stock = n.get();
 			return stock.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/stock-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(stockId)+";/swagger-ui.html#/stock-controller");
 		}
 		
 	}
@@ -81,7 +80,12 @@ public class StockController {
 	@DeleteMapping("/delete/{stockId}")  
 	private void deleteStock(@PathVariable("stockId") Integer stockId)
 	{  
-		stockRepository.deleteById(stockId);
+		if(stockRepository.findById(stockId).isPresent()){
+			stockRepository.deleteById(stockId);
+		}
+		else{
+			throw new RessourceIntrouvableException(Integer.toString(stockId)+";/swagger-ui.html#/stock-controller");
+		}
 	}
 
 	@RequestMapping(value = { "/", "/update/{stockId}" }, method = RequestMethod.PUT, produces = "application/json")
@@ -115,18 +119,12 @@ public class StockController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("stock", stock.stockAjoutJSON());
-				return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(stockId)+";/swagger-ui.html#/stock-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/stock-controller");
-			return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(stockId)+";/swagger-ui.html#/stock-controller");
 		}
 		
 	}  

@@ -12,6 +12,8 @@ import com.example.clickandcollectapi.entities.Creneau;
 import com.example.clickandcollectapi.entities.Magasin;
 import com.example.clickandcollectapi.entities.Message;
 import com.example.clickandcollectapi.entities.User;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.CreneauRepository;
 import com.example.clickandcollectapi.repositories.MessageRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,7 +71,7 @@ public class CreneauController {
 
 
 	@RequestMapping(value = { "/", "/{creneauId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findCreneauById(@PathVariable Integer creneauId) throws JsonProcessingException {
+	public @ResponseBody String findCreneauById(@PathVariable Integer creneauId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		
 		Optional<Creneau> n = creneauRepository.findById(creneauId);
@@ -78,10 +80,11 @@ public class CreneauController {
 			return creneau.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/creneau-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/creneau-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(creneauId)+";/swagger-ui.html#/creneau-controller");
 		}
 		
 	}
@@ -89,12 +92,20 @@ public class CreneauController {
 	@DeleteMapping("/delete/{creneauId}")  
 	private void deleteCreneau(@PathVariable("creneauId") Integer creneauId)   
 	{  
-		creneauRepository.deleteById(creneauId);
+		if(creneauRepository.findById(creneauId).isPresent())
+		{
+			creneauRepository.deleteById(creneauId);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException(Integer.toString(creneauId)+";/swagger-ui.html#/creneau-controller");
+		}
+		
 	}
 
 	@RequestMapping(value = { "/", "/update/{creneauId}" }, method = RequestMethod.PUT, produces = "application/json") 
 	private @ResponseBody String update(@PathVariable("creneauId") Integer creneauId, @RequestParam(required = false) Integer etat, @RequestParam(required = false) String dateCreneau, @RequestParam(required = false) Integer idMagasin, @RequestParam(required = false) Integer idUser)
-			throws JsonProcessingException, ParseException 
+			throws JsonProcessingException, ParseException, RessourceBadRequestException
 	{  
 		Optional<Creneau> n = creneauRepository.findById(creneauId);
 		if(n.isPresent()){
@@ -124,18 +135,20 @@ public class CreneauController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("creneau", creneau.toJSON());
-				return JSONInfo.toString();
+				// JSONObject JSONInfo = new JSONObject();
+				// JSONInfo.put("message", "Aucune modification nécéssaire");
+				// JSONInfo.put("creneau", creneau.toJSON());
+				// return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(creneauId)+";/swagger-ui.html#/creneau-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/creneau-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/creneau-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(creneauId)+";/swagger-ui.html#/creneau-controller");
 		}
 		
 	}  

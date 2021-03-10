@@ -107,9 +107,9 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.PUT).hasAuthority("ROLE_ADMIN")
 				.antMatchers(HttpMethod.POST, "/user").permitAll()
 				.antMatchers(HttpMethod.POST, "/message").permitAll()
-				.antMatchers(HttpMethod.POST, "/commande").authenticated()
-				.antMatchers(HttpMethod.POST, "/contenir").authenticated()
-				.antMatchers(HttpMethod.POST, "/creneau").authenticated()
+				.antMatchers("/commande").authenticated()
+				.antMatchers("/contenir").authenticated()
+				.antMatchers("/creneau").authenticated()
 				.antMatchers("/authenticate").permitAll().
 						anyRequest().authenticated().and().
 						exceptionHandling().and().sessionManagement()
