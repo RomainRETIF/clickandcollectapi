@@ -7,6 +7,8 @@ import java.util.Optional;
 import com.example.clickandcollectapi.entities.Commande;
 import com.example.clickandcollectapi.entities.Magasin;
 import com.example.clickandcollectapi.entities.User;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.CommandeRepository;
 import com.example.clickandcollectapi.repositories.MagasinRepository;
 import com.example.clickandcollectapi.repositories.UserRepository;
@@ -61,7 +63,7 @@ public class CommandeController {
 	}
 
 	@RequestMapping(value = { "/", "/{commandeId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findCommandeById(@PathVariable Integer commandeId) throws JsonProcessingException {
+	public @ResponseBody String findCommandeById(@PathVariable Integer commandeId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		Optional<Commande> n = commandeRepository.findById(commandeId);
 		if(n.isPresent()){
@@ -69,10 +71,11 @@ public class CommandeController {
 			return commande.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/commande-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/commande-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(commandeId)+";/swagger-ui.html#/commande-controller");
 		}
 		
 	}
@@ -81,13 +84,21 @@ public class CommandeController {
 	@DeleteMapping("/delete/{commandeId}")  
 	private void deleteCommande(@PathVariable("commandeId") Integer commandeId)   
 	{  
-		commandeRepository.deleteById(commandeId);
+		if(commandeRepository.findById(commandeId).isPresent())
+		{
+			commandeRepository.deleteById(commandeId);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException(Integer.toString(commandeId)+";/swagger-ui.html#/commande-controller");
+		}
+		
 	}
 
 	@RequestMapping(value = { "/", "/update/{commandeId}" }, method = RequestMethod.PUT, produces = "application/json") 
 	private @ResponseBody String update(@PathVariable("commandeId") Integer commandeId,
 	@RequestParam(required = false) Integer etatCommande,@RequestParam(required = false) Integer idMagasin,
-	@RequestParam(required = false) Integer idUser) throws JsonProcessingException 
+	@RequestParam(required = false) Integer idUser) throws JsonProcessingException,RessourceBadRequestException
 	{  
 		Optional<Commande> n = commandeRepository.findById(commandeId);
 		if(n.isPresent()){
@@ -116,18 +127,20 @@ public class CommandeController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("commande", commande.toJSON());
-				return JSONInfo.toString();
+				// JSONObject JSONInfo = new JSONObject();
+				// JSONInfo.put("message", "Aucune modification nécéssaire");
+				// JSONInfo.put("commande", commande.toJSON());
+				// return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(commandeId)+";/swagger-ui.html#/commande-controller");
 			}
 			
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/commande-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/commande-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(commandeId)+";/swagger-ui.html#/commande-controller");
 		}
 		
 	}  

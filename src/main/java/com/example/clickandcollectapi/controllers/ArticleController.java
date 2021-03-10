@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.clickandcollectapi.entities.Article;
 import com.example.clickandcollectapi.entities.Stock;
 import com.example.clickandcollectapi.entities.TypeArticle;
+import com.example.clickandcollectapi.exceptions.RessourceBadRequestException;
+import com.example.clickandcollectapi.exceptions.RessourceIntrouvableException;
 import com.example.clickandcollectapi.repositories.ArticleRepository;
 import com.example.clickandcollectapi.repositories.TypeArticleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,7 +44,7 @@ public class ArticleController {
 	}
 
 	@RequestMapping(value = { "/", "/{articleId}" }, method = RequestMethod.GET, produces = "application/json")
-	public @ResponseBody String findArticleById(@PathVariable Integer articleId) throws JsonProcessingException {
+	public @ResponseBody String findArticleById(@PathVariable Integer articleId) throws JsonProcessingException, RessourceIntrouvableException {
 		
 		Optional<Article> n = articleRepository.findById(articleId);
 		if(n.isPresent()){
@@ -50,10 +52,11 @@ public class ArticleController {
 			return typeArticle.toJSON().toString();
 		}
 		else{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/article-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/article-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(articleId)+";/swagger-ui.html#/article-controller");
 		}
 		
 	}
@@ -62,12 +65,19 @@ public class ArticleController {
 	@DeleteMapping("/delete/{articleId}")  
 	private void deleteTypeArticle(@PathVariable("articleId") Integer articleId)   
 	{  
+		if(articleRepository.findById(articleId).isPresent())
+		{
 		articleRepository.deleteById(articleId);
+		}
+		else
+		{
+			throw new RessourceIntrouvableException(Integer.toString(articleId)+";/swagger-ui.html#/article-controller");
+		}
 	}
 	
 	@RequestMapping(value = { "/", "/update/{articleId}" }, method = RequestMethod.PUT, produces = "application/json") 
 	private @ResponseBody String update(@PathVariable("articleId") Integer articleId, @RequestParam(required = false) Double prix, @RequestParam(required = false) Integer idTypeArticle)
-			throws JsonProcessingException 
+			throws JsonProcessingException, RessourceBadRequestException
 	{  
 		Optional<Article> n = articleRepository.findById(articleId);
 		if(n.isPresent()){
@@ -89,19 +99,21 @@ public class ArticleController {
 			}
 			else
 			{
-				JSONObject JSONInfo = new JSONObject();
-				JSONInfo.put("message", "Aucune modification nécéssaire");
-				JSONInfo.put("article", article.toJSON());
-				return JSONInfo.toString();
+				// JSONObject JSONInfo = new JSONObject();
+				// JSONInfo.put("message", "Aucune modification nécéssaire");
+				// JSONInfo.put("article", article.toJSON());
+				// return JSONInfo.toString();
+				throw new RessourceBadRequestException(Integer.toString(articleId)+";/swagger-ui.html#/article-controller");
 			}
 			
 		}
 		else
 		{
-			JSONObject JSONErreur = new JSONObject();
-			JSONErreur.put("message", "Error");
-			JSONErreur.put("help", "/swagger-ui.html#/article-controller");
-			return JSONErreur.toString();
+			// JSONObject JSONErreur = new JSONObject();
+			// JSONErreur.put("message", "Error");
+			// JSONErreur.put("help", "/swagger-ui.html#/article-controller");
+			// return JSONErreur.toString();
+			throw new RessourceIntrouvableException(Integer.toString(articleId)+";/swagger-ui.html#/article-controller");
 		}
 		
 	}
